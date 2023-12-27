@@ -18,5 +18,8 @@ namespace University.Repository
 
         Task<Student> GetStudentByIdAsync(int Id);
 
+        Task<int> AddLessonAsync(Lesson lesson);
+        Task<bool> SaveChanges();
+
     }
 }

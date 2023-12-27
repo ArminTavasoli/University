@@ -46,14 +46,28 @@ namespace University.Repository
             return await _context.Teachers.Where(t => t.ID == Id).FirstOrDefaultAsync();
         }
 
+        //Get All Student
         public async Task<IEnumerable<Student>> GetAllStudentAsync()
         {
             return await _context.Students.OrderBy(s => s.ID).ToListAsync();
         }
 
+        //Get Student With ID
         public async Task<Student> GetStudentByIdAsync(int Id)
         {
             return await _context.Students.Where(s => s.ID == Id).FirstOrDefaultAsync();
+        }
+
+        //Add Lesson (Post)
+        public async Task<int> AddLessonAsync(Lesson lesson)
+        {
+            await _context.Lessons.AddAsync(lesson);
+            return lesson.Code;
+        }
+
+        public async Task<bool> SaveChanges()
+        {
+            return (await _context.SaveChangesAsync() > 0);
         }
     }
 }

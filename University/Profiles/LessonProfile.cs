@@ -7,6 +7,7 @@ namespace University.Profiles
         public LessonProfile()
         {
             CreateMap<Models.Lesson , Dto.LessonDto>();
+            CreateMap<Dto.LessonForCreationDto, Models.Lesson>();
         }
     }
 }

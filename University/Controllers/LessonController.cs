@@ -24,7 +24,7 @@ namespace University.Controllers
         {
             var lessons = await _UniversityRepository.GetAllLessonsAsync();
             var AllLesson = _mapper.Map<IEnumerable<LessonDto>>(lessons);
-            return Ok(new {Message = "کل درس ها" , AllLesson });
+            return Ok(new {Message = "All Lesson List :" , AllLesson });
         }
 
         [HttpGet("{code}")]
@@ -32,7 +32,20 @@ namespace University.Controllers
         {
             var lesson = await _UniversityRepository.GetLessonsByIdAsync(code);
             var lessonMapping = _mapper.Map<LessonDto>(lesson);
-            return Ok(new { Message = $"کتاب با کد {code}" , lessonMapping});
+            return Ok(new { Message = $"Your Lesson Code Is {code}" , lessonMapping});
         }
+
+        //Add Lesson (Post)
+        [HttpPost]
+        public async Task<ActionResult<LessonDto>> AddLessonAsync(LessonForCreationDto lessonCreation)
+        {
+            var lesson = _mapper.Map<Models.Lesson>(lessonCreation);
+            await _UniversityRepository.AddLessonAsync(lesson);
+            await _UniversityRepository.SaveChanges();
+            var lessonMapping = _mapper.Map<Dto.LessonDto>(lesson);
+            return Ok(new {Message = $"Add Lesson By Name {lesson.Name}" , lesson.Code});
+
+        }
+
     }
 }
