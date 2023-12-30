@@ -19,6 +19,8 @@ namespace University.Controllers
             this._mapper = mapper ?? throw new ArgumentNullException();
         }
 
+        #region Get All Lessons
+        //Get All Lessons
         [HttpGet]
         public async Task<ActionResult<IEnumerable<LessonDto>>> GetLessons()
         {
@@ -26,7 +28,9 @@ namespace University.Controllers
             var AllLesson = _mapper.Map<IEnumerable<LessonDto>>(lessons);
             return Ok(new {Message = "All Lesson List :" , AllLesson });
         }
+        #endregion
 
+        #region Get Lesson With LessonCode
         [HttpGet("{code}")]
         public async Task<ActionResult<LessonDto>> GetLessonWithId(int code)
         {
@@ -34,7 +38,10 @@ namespace University.Controllers
             var lessonMapping = _mapper.Map<LessonDto>(lesson);
             return Ok(new { Message = $"Your Lesson Code Is {code}" , lessonMapping});
         }
+        #endregion
 
+
+        #region Add Lesson
         //Add Lesson (Post)
         [HttpPost]
         public async Task<ActionResult<LessonDto>> AddLessonAsync(LessonForCreationDto lessonCreation)
@@ -46,7 +53,10 @@ namespace University.Controllers
             return Ok(new {Message = $"Add Lesson By Name {lesson.Name}" , lesson.Code});
 
         }
+        #endregion
 
+
+        #region Update Lesson
         //Update Lesson
         [HttpPut("{code}")]
         public async Task<ActionResult> UpdateLessonAsync(int code, LessonForUpdateDto lessonUpdate)
@@ -60,6 +70,23 @@ namespace University.Controllers
             await _UniversityRepository.SaveChanges();
             return StatusCode(204, $"The Lesson By Id {code} Is Update");
         }
+        #endregion
+
+        #region Delete Lesson
+        //Delete Lesson
+        [HttpDelete("{lessonCode}")]
+        public async Task<ActionResult> DeleteLesson(int lessonCode)
+        {
+            var lesson = await _UniversityRepository.GetLessonsByIdAsync(lessonCode);
+            if(lesson == null)
+            {
+                return StatusCode(404, $"Lesson With Code {lessonCode} not found");
+            }
+            _UniversityRepository.DeleteLessonAsync(lesson);
+            await _UniversityRepository.SaveChanges();
+            return StatusCode(200, $"Lesson With Code {lessonCode} Is Deleted");
+        }
+        #endregion
 
 
 

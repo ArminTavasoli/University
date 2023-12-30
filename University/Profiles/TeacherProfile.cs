@@ -6,7 +6,14 @@ namespace University.Profiles
     {
         public TeacherProfile()
         {
+            //Get
             CreateMap<Models.Teacher, Dto.TeacherDto>();
+
+            //Post
+            CreateMap<Dto.TeacherForCreationDto , Models.Teacher>();
+
+            //Put
+            CreateMap<Dto.TeacherForUpdateDto, Models.Teacher>();
         }
     }
 }

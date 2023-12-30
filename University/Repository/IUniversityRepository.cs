@@ -4,24 +4,43 @@ namespace University.Repository
 {
     public interface IUniversityRepository
     {
+        //Lesson
         Task<IEnumerable<Lesson>> GetAllLessonsAsync();
 
         Task<Lesson> GetLessonsByIdAsync(int code);
 
         Task<Lesson> GetlessonByTeacher(int code, bool includeTeacher);
 
-        Task<IEnumerable< Teacher>> GetAllTeacherAsync();
+        Task<int> AddLessonAsync(Lesson lesson);
+     
+         void DeleteLessonAsync(Lesson lesson);
+
+
+
+        //Teacher
+        Task<IEnumerable<Teacher>> GetAllTeacherAsync();
 
         Task<Teacher> GetTeacherByIdAsync(int Id);
 
-        Task <IEnumerable<Student>> GetAllStudentAsync();
+        Task<int> AddTeacherAsync(Teacher teacher);
+
+        void DeleteTeacherAsync(Teacher teacher);
+
+
+
+        //Students
+        Task<IEnumerable<Student>> GetAllStudentAsync();
 
         Task<Student> GetStudentByIdAsync(int Id);
 
-        Task<int> AddLessonAsync(Lesson lesson);
-        Task<bool> SaveChanges();
+        Task<int> AddStudent(Student student);
 
-        Task void DeleteLessonAsync();
+        void DeleteStudent(Student student);
+
+
+
+
+        Task<bool> SaveChanges();
 
     }
 }

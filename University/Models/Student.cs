@@ -14,10 +14,10 @@ namespace University.Models
         public string Name { get; set; }
 
         [MaxLength(10)]
-        public int NationalCode { get; set; }
+        public string NationalCode { get; set; }
 
         [MaxLength(11)]
-        public int? PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
     }
 }
