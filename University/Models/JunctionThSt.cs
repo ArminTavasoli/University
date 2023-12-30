@@ -18,5 +18,9 @@ namespace University.Models
         [ForeignKey("StudentID")]
         public Student? Student { get; set; }
         public int StudentID { get; set; }
+
+        [ForeignKey("LessonID")]
+        public Lesson? Lesson { get; set; }
+        public int LessonID { get; set; }
     }
 }

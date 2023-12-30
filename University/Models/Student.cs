@@ -18,5 +18,6 @@ namespace University.Models
 
         [MaxLength(11)]
         public int? PhoneNumber { get; set; }
+
     }
 }
