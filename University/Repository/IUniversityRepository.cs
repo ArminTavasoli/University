@@ -21,5 +21,7 @@ namespace University.Repository
         Task<int> AddLessonAsync(Lesson lesson);
         Task<bool> SaveChanges();
 
+        Task void DeleteLessonAsync();
+
     }
 }

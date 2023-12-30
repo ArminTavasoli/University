@@ -2,11 +2,10 @@
 
 namespace University.Dto
 {
-    public class LessonForCreationDto
+    public class LessonForUpdateDto
     {
         [Required]
         [MaxLength(14)]
-        public string Name { get; set; }
-
+        public String Name { get; set; }
     }
 }
