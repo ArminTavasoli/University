@@ -24,7 +24,7 @@ namespace University.Controllers
         {
             var student = await _UniversityRepository.GetAllStudentAsync();
             var MappingStudent = _mapper.Map<IEnumerable<StudentDto>>(student);
-            return Ok(new { Message = "لیست دانشجوها", MappingStudent });
+            return Ok(new { Message = "Student List...", MappingStudent });
         }
 
 
@@ -70,6 +70,47 @@ namespace University.Controllers
             _UniversityRepository.DeleteStudent(student);
             await _UniversityRepository.SaveChanges();
             return Ok(new {Message = $"Student with ID {StudentID} id delete..." });
+        }
+
+
+
+        #region Relation (Join)
+        //Get Student & Lesson (Join)
+        [HttpGet("lesson")]
+        public async Task<ActionResult<IEnumerable<JoinLessonAndStudentDto>>> GetStudentLessonAsync()
+        {
+            var StudntsLesson = await _UniversityRepository.JoinStudentAndLessonAsync();
+            var StudentHaveLesson  = _mapper.Map<IEnumerable<JoinLessonAndStudentDto>>(StudntsLesson);
+            return Ok(new { Message = "Student that select Lesson..." , StudentHaveLesson });
+        }
+
+
+        //Get Student & Lesson (Join)
+        [HttpGet("lesson/{studentID}")]
+        public async Task<ActionResult<JoinLessonAndStudentDto>> GetStudentLessonWithIdAsync(int studentID)
+        {
+            /*var student = await _UniversityRepository.GetStudentByIdAsync(studentID);*/
+            var studentLesson = await _UniversityRepository.GetStudentsLessonByIdAsync(studentID);
+            var lessonForThisStudent = _mapper.Map<JoinLessonAndStudentDto>(studentLesson);
+            return Ok(new { Message = $"Lessons about student with Id{studentLesson.StudentID} and name {studentLesson.StudentName}" , lessonForThisStudent.LessonID , lessonForThisStudent.LessonName });
+        }
+
+
+        //Get Lesson And Teacher For Student
+        [HttpGet("lesson&teacher/{studentID}")]
+        public async Task<ActionResult> GetListLessonAndTeacherForStudentAsync(int studentID)
+        {
+            var lessonAndTeacherForStudent = await _UniversityRepository.GetLessonAndTeacherForStudentAsync(studentID);
+            _mapper.Map<JunctionTableForJoinDto>(lessonAndTeacherForStudent);
+            return Ok(new
+            {
+                Message = $"The list of Lesson and Teacher for {lessonAndTeacherForStudent.StudentName} with ID {lessonAndTeacherForStudent.StudentId}",
+                lessonAndTeacherForStudent.LessonCode,
+                lessonAndTeacherForStudent.LessonName,
+                lessonAndTeacherForStudent.TeacherId,
+                lessonAndTeacherForStudent.TeacherName
+            });
+            #endregion Relation (Join)
         }
     }
 }

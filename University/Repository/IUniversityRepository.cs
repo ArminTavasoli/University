@@ -16,7 +16,6 @@ namespace University.Repository
          void DeleteLessonAsync(Lesson lesson);
 
 
-
         //Teacher
         Task<IEnumerable<Teacher>> GetAllTeacherAsync();
 
@@ -37,9 +36,23 @@ namespace University.Repository
 
         void DeleteStudent(Student student);
 
+        
+        //Get Lesson and Teacher for Student
+        Task<JunctionTableForJoin> GetLessonAndTeacherForStudentAsync(int studentID);
 
+        //Join Lesson & Teacher
+        Task<IEnumerable<LessonJoinTeacher>> JoinTeacherAndLessonAsync();
 
+        //Get Teacher and Lesson with ID
+        Task<LessonJoinTeacher> GetTeacherAndLessonByIdAsync(int TeacherID);
 
+        //Join Lesson & Student
+        Task<IEnumerable<LessonJoinStudent>> JoinStudentAndLessonAsync();
+
+        //Get Lesson and Student with ID
+        Task<LessonJoinStudent> GetStudentsLessonByIdAsync(int studentID);
+
+        //Save
         Task<bool> SaveChanges();
 
     }
