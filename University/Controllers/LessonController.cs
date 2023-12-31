@@ -34,6 +34,10 @@ namespace University.Controllers
         public async Task<ActionResult<LessonDto>> GetLessonWithId(int code)
         {
             var lesson = await _UniversityRepository.GetLessonsByIdAsync(code);
+            if(lesson == null)
+            {
+                return StatusCode(404, $"lesson with ID {code} not found...");
+            }
             var lessonMapping = _mapper.Map<LessonDto>(lesson);
             return Ok(new { Message = $"Your Lesson Code Is {code}", lessonMapping });
         }
@@ -63,11 +67,11 @@ namespace University.Controllers
             var lesson = await _UniversityRepository.GetLessonsByIdAsync(code);
             if (lesson == null)
             {
-                return StatusCode(404, "This Lesson Not Found...");
+                return StatusCode(404, $"This Lesson with ID {code} Not Found...");
             }
             _mapper.Map(lessonUpdate, lesson);
             await _UniversityRepository.SaveChanges();
-            return StatusCode(204, $"The Lesson By Id {code} Is Update");
+            return Ok(new {Message = $"The Lesson By Id {code} Is Update" });
         }
         #endregion
 
@@ -79,11 +83,11 @@ namespace University.Controllers
             var lesson = await _UniversityRepository.GetLessonsByIdAsync(lessonCode);
             if (lesson == null)
             {
-                return StatusCode(404, $"Lesson With Code {lessonCode} not found");
+                return StatusCode(404, $"Lesson With Code {lessonCode} not found...");
             }
             _UniversityRepository.DeleteLessonAsync(lesson);
             await _UniversityRepository.SaveChanges();
-            return StatusCode(200, $"Lesson With Code {lessonCode} Is Deleted");
+            return StatusCode(200, $"Lesson With Code {lessonCode} Is Deleted...");
         }
         #endregion
 
@@ -92,7 +96,7 @@ namespace University.Controllers
 
         //Get Lesson & Teacher
         [HttpGet("lesson&Teacher")]
-        public async Task<ActionResult<IEnumerable<JoinLessonAndTeacherDto>>> JoinLessonWithTeacherAsync(int lessonId, int teacherId)
+        public async Task<ActionResult<IEnumerable<JoinLessonAndTeacherDto>>> JoinLessonWithTeacherAsync()
         {
             var tableJoin = await _UniversityRepository.JoinTeacherAndLessonAsync();
             var LessonsTeacher = _mapper.Map<IEnumerable<JoinLessonAndTeacherDto>>(tableJoin);
@@ -105,6 +109,10 @@ namespace University.Controllers
         public async Task<ActionResult> GetTeachersLessonAsync(int teacherId)
         {
             var getTeacherAndLessonByID = await _UniversityRepository.GetTeacherAndLessonByIdAsync(teacherId);
+            if(getTeacherAndLessonByID == null)
+            {
+                return StatusCode(404 , $"not found Teacher with ID {teacherId}");
+            }
             return Ok(new { Message = $"You select Teacher {getTeacherAndLessonByID.TeacherName}...", getTeacherAndLessonByID });
         }
         #endregion relation (Join)
