@@ -18,13 +18,13 @@ namespace University.Repository
         //All Lesson
         public async Task<IEnumerable<Lesson>> GetAllLessonsAsync()
         {
-            return await _context.Lessons.OrderBy(o => o.Code).ToListAsync();
+            return await _context.Lessons.OrderBy(o => o.ID).ToListAsync();
         }
 
         //Get Lesson With ID
         public async Task<Lesson> GetLessonsByIdAsync(int code)
         {
-            return await _context.Lessons.Where(l => l.Code == code).FirstOrDefaultAsync();
+            return await _context.Lessons.Where(l => l.ID == code).FirstOrDefaultAsync();
         }
 
         //Get Lesson With ID & Include Teacher
@@ -37,7 +37,7 @@ namespace University.Repository
         public async Task<int> AddLessonAsync(Lesson lesson)
         {
             await _context.Lessons.AddAsync(lesson);
-            return lesson.Code;
+            return lesson.ID;
         }
 
         //Delete Lesson
@@ -113,32 +113,34 @@ namespace University.Repository
         //Get Lesson and Teacher for Student
         public async Task<JunctionTableForJoin> GetLessonAndTeacherForStudentAsync(int studentID)
         {
-            var StudentsLessonAndTeacher = await _context.Students.Join(_context.JunctionThSts,
-                                                                        student => student.ID,
-                                                                        junction => junction.StudentID,
-                                                                        (student, junction) => new
-                                                                        {
-                                                                            student,
-                                                                            junction
-                                                                        }).Join(_context.Lessons,
-                                                                            ResultJoin => ResultJoin.junction.LessonID,
-                                                                            lesson => lesson.Code,
-                                                                            (ResultJoin, lesson) => new
-                                                                            {
-                                                                                ResultJoin,
-                                                                                lesson
-                                                                            }).Join(_context.Teachers,
-                                                                                ResultJoin2 => ResultJoin2.ResultJoin.junction.TeacherID,
-                                                                                teacher => teacher.ID,
-                                                                                (ResultJoin2, teacher) => new JunctionTableForJoin
-                                                                                {
-                                                                                    StudentId = studentID,
-                                                                                    StudentName = ResultJoin2.ResultJoin.student.Name,
-                                                                                    LessonCode = ResultJoin2.lesson.Code,
-                                                                                    LessonName = ResultJoin2.lesson.Name,
-                                                                                    TeacherId = teacher.ID,
-                                                                                    TeacherName = teacher.Name
-                                                                                }).FirstOrDefaultAsync();
+            var StudentsLessonAndTeacher = await _context.Students
+                            .Where(s => s.ID == studentID)
+                            .Join(_context.JunctionThSts,
+                                  student => student.ID,
+                                  junction => junction.StudentID,
+                                  (student, junction) => new
+                                  {
+                                      student,
+                                      junction
+                                  }).Join(_context.Lessons,
+                                   ResultJoin => ResultJoin.junction.LessonID,
+                                   lesson => lesson.ID,
+                                   (ResultJoin, lesson) => new
+                                   {
+                                       ResultJoin,
+                                       lesson
+                                   }).Join(_context.Teachers,
+                                    ResultJoin2 => ResultJoin2.ResultJoin.junction.TeacherID,
+                                    teacher => teacher.ID,
+                                    (ResultJoin2, teacher) => new JunctionTableForJoin
+                                    {
+                                        StudentId = studentID,
+                                        StudentName = ResultJoin2.ResultJoin.student.Name,
+                                        LessonCode = ResultJoin2.lesson.ID,
+                                        LessonName = ResultJoin2.lesson.Name,
+                                        TeacherId = teacher.ID,
+                                        TeacherName = teacher.Name
+                                    }).FirstOrDefaultAsync();
             return StudentsLessonAndTeacher;
         }
 
@@ -147,7 +149,7 @@ namespace University.Repository
         public async Task<IEnumerable<LessonJoinTeacher>> JoinTeacherAndLessonAsync()
         {
             var JoinTable = await _context.Lessons.Join(_context.JunctionThSts,
-                                                           lesson => lesson.Code,
+                                                           lesson => lesson.ID,
                                                            junctionTable => junctionTable.LessonID,
                                                            (lesson, junctionTable) => new
                                                            {
@@ -158,7 +160,7 @@ namespace University.Repository
                                                             teacher => teacher.ID,
                                                             (joinResult, teacher) => new LessonJoinTeacher
                                                             {
-                                                                LessonId = joinResult.lesson.Code,
+                                                                LessonId = joinResult.lesson.ID,
                                                                 LessonName = joinResult.lesson.Name,
                                                                 TeacherId = teacher.ID,
                                                                 TeacherName = teacher.Name
@@ -180,10 +182,10 @@ namespace University.Repository
                                                                                  junctionTable
                                                                              }).Join(_context.Lessons,
                                                                                  join => join.junctionTable.LessonID,
-                                                                                 lesson => lesson.Code,
+                                                                                 lesson => lesson.ID,
                                                                                  (join, lesson) => new LessonJoinTeacher
                                                                                  {
-                                                                                     LessonId = lesson.Code,
+                                                                                     LessonId = lesson.ID,
                                                                                      LessonName = lesson.Name,
                                                                                      TeacherId = TeacherID,
                                                                                      TeacherName = join.teacher.Name
@@ -196,7 +198,7 @@ namespace University.Repository
         public async Task<IEnumerable<LessonJoinStudent>> JoinStudentAndLessonAsync()
         {
             var JoinStudentAndLesson = await _context.Lessons.Join(_context.JunctionThSts,
-                                                                      lesson => lesson.Code,
+                                                                      lesson => lesson.ID,
                                                                       junction => junction.LessonID,
                                                                       (lesson, junction) => new
                                                                       {
@@ -207,7 +209,7 @@ namespace University.Repository
                                                                         student => student.ID,
                                                                         (JoinTable, student) => new LessonJoinStudent
                                                                         {
-                                                                            LessonID = JoinTable.lesson.Code,
+                                                                            LessonID = JoinTable.lesson.ID,
                                                                             LessonName = JoinTable.lesson.Name,
                                                                             StudentID = student.ID,
                                                                             StudentName = student.Name
@@ -216,26 +218,30 @@ namespace University.Repository
         }
 
 
-        //Get Lesson & Student (Join)
+        //Get Lesson & Student (Join) with ID
         public async Task<LessonJoinStudent> GetStudentsLessonByIdAsync(int studentID)
         {
-            var joinStudentAndLesson = await _context.Students.Join(_context.JunctionThSts,
-                                                                     student => student.ID,
-                                                                     junction => junction.StudentID,
-                                                                     (student, junction) => new
-                                                                     {
-                                                                         student,
-                                                                         junction
-                                                                     }).Join(_context.Lessons,
-                                                                        joinResult => joinResult.junction.LessonID,
-                                                                        lesson => lesson.Code,
-                                                                        (joinResult, lesson) => new LessonJoinStudent
-                                                                        {
-                                                                            StudentID = studentID,
-                                                                            StudentName = joinResult.student.Name,
-                                                                            LessonID = lesson.Code,
-                                                                            LessonName = lesson.Name
-                                                                        }).FirstOrDefaultAsync();
+            var joinStudentAndLesson = await _context.Students
+                    .Where(s => s.ID == studentID)
+                    .Join(_context.JunctionThSts,
+                      student => student.ID,
+                      junction => junction.StudentID,
+                      (student, junction) => new
+                      {
+                          student,
+                          junction
+                      })
+                    .Join(_context.Lessons,
+                      joinResult => joinResult.junction.LessonID,
+                      lesson => lesson.ID,
+                      (joinResult, lesson) => new LessonJoinStudent
+                      {
+                          StudentID = studentID,
+                          StudentName = joinResult.student.Name,
+                          LessonID = lesson.ID,
+                          LessonName = lesson.Name
+                      }).FirstOrDefaultAsync();
+
             return joinStudentAndLesson;
         }
         #endregion Join

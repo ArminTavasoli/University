@@ -24,7 +24,7 @@ namespace University.Controllers
         {
             var teacher = await _UniversityRepository.GetAllTeacherAsync();
             var AllTeacher = _mapper.Map<IEnumerable<TeacherDto>>(teacher);
-            return Ok(new { Message = "لیست تمام استادها" , AllTeacher});
+            return Ok(new { Message = "All Teacher..." , AllTeacher});
         }
 
         //Get Teacher With ID

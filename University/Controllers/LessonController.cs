@@ -53,7 +53,7 @@ namespace University.Controllers
             await _UniversityRepository.AddLessonAsync(lesson);
             await _UniversityRepository.SaveChanges();
             var lessonMapping = _mapper.Map<Dto.LessonDto>(lesson);
-            return Ok(new { Message = $"Add Lesson By Name {lesson.Name}", lesson.Code });
+            return Ok(new { Message = $"Add Lesson By Name {lesson.Name}", lesson.ID});
 
         }
         #endregion
