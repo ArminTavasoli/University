@@ -32,6 +32,10 @@ namespace University.Controllers
         public async Task<ActionResult<TeacherDto>> GetTeacherById(int Id)
         {
             var teacher = await _UniversityRepository.GetTeacherByIdAsync(Id);
+            if(teacher == null)
+            {
+                return BadRequest($"Teacher with ID {Id} not found...");
+            }
             return Ok(_mapper.Map<TeacherDto>(teacher));
         }
 
