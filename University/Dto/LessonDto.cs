@@ -1,6 +1,6 @@
 ﻿namespace University.Dto
 {
-    public class LessonDto
+    public class LessonDto 
     {
         public int Code { get; set; }
 

@@ -18,7 +18,7 @@ namespace University.Controllers
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-
+        //Get All Student
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentDto>>> GetAllStudent()
         {
@@ -28,11 +28,17 @@ namespace University.Controllers
         }
 
 
+        //Get Student with ID
         [HttpGet("{Id}")]
         public async Task<ActionResult<StudentDto>> GetStudentWithId(int Id)
         {
-            var student = await _UniversityRepository.GetStudentByIdAsync(Id);
-            return Ok(_mapper.Map<StudentDto>(student));
+            var GetStudent = await _UniversityRepository.GetStudentByIdAsync(Id);
+            if(GetStudent == null)
+            {
+                return BadRequest($"Student with ID {Id} not found ...");
+            }
+            var Student = _mapper.Map<StudentDto>(GetStudent);
+            return Ok(new {Message = $"You select stuent {GetStudent.Name} with ID {GetStudent.ID} ..."});
         }
 
         [HttpPost]
@@ -89,8 +95,16 @@ namespace University.Controllers
         [HttpGet("lesson/{studentID}")]
         public async Task<ActionResult<JoinLessonAndStudentDto>> GetStudentLessonWithIdAsync(int studentID)
         {
-            /*var student = await _UniversityRepository.GetStudentByIdAsync(studentID);*/
+            var GetStudent = await _UniversityRepository.GetStudentByIdAsync(studentID);
+            if (GetStudent == null)
+            {
+                return NotFound($"Not found Student with ID {studentID} ...");
+            }
             var studentLesson = await _UniversityRepository.GetStudentsLessonByIdAsync(studentID);
+            if(studentLesson == null)
+            {
+                return BadRequest($"Student with ID {studentID} do not have lesson...");
+            }
             var lessonForThisStudent = _mapper.Map<JoinLessonAndStudentDto>(studentLesson);
             return Ok(new { Message = $"Lessons about student with Id{studentLesson.StudentID} and name {studentLesson.StudentName}" , lessonForThisStudent.LessonID , lessonForThisStudent.LessonName });
         }
@@ -100,17 +114,28 @@ namespace University.Controllers
         [HttpGet("lesson&teacher/{studentID}")]
         public async Task<ActionResult> GetListLessonAndTeacherForStudentAsync(int studentID)
         {
+            var GetStudent = await _UniversityRepository.GetStudentByIdAsync(studentID);
+            if (GetStudent == null)
+            {
+                return BadRequest($"Student with Id {studentID} not found...");
+            }
             var lessonAndTeacherForStudent = await _UniversityRepository.GetLessonAndTeacherForStudentAsync(studentID);
+            if(lessonAndTeacherForStudent == null)
+            {
+                return BadRequest($"student with ID {studentID} do not have lesson...");
+            }
             _mapper.Map<JunctionTableForJoinDto>(lessonAndTeacherForStudent);
             return Ok(new
             {
-                Message = $"The list of Lesson and Teacher for {lessonAndTeacherForStudent.StudentName} with ID {lessonAndTeacherForStudent.StudentId}",
+                Message = $"The list of Lesson and Teacher for {GetStudent.Name} with ID {lessonAndTeacherForStudent.StudentId}",
                 lessonAndTeacherForStudent.LessonCode,
                 lessonAndTeacherForStudent.LessonName,
                 lessonAndTeacherForStudent.TeacherId,
                 lessonAndTeacherForStudent.TeacherName
             });
-            #endregion Relation (Join)
+
         }
+            #endregion Relation (Join)
+        
     }
 }
