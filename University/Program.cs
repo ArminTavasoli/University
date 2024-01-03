@@ -32,6 +32,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+
+
+using (var serviceScope = app.Services.CreateScope())
+{
+    var dbContext = serviceScope.ServiceProvider.GetRequiredService<UniversityDbContext>();
+    dbContext.Database.Migrate();
+}
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
