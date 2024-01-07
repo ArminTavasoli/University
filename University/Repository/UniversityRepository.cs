@@ -324,9 +324,45 @@ namespace University.Repository
                                                    _ => student => student.ID
                                                };
 
+        private Expression<Func<Teacher, object>> GetTeacherProperty(GetTeacher getTeacher)
+                        => getTeacher.sortCoumn?.ToLower()
+                                    switch
+                                     {
+                                         "Name" => lesson => lesson.Name,
+                                         "NationalCode" => lesson => lesson.NationalCode,
+                                         "Number" => lesson => lesson.PhoneNumber,
+                                         _ => lesson => lesson.ID
+                                     };
+
         public Task<Lesson> GetlessonByTeacher(int code, bool includeTeacher)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Teacher>> GetAllTeacherAsync(GetTeacher TeacherRequest)
+        {
+            IQueryable<Teacher> teacherQuery = _context.Teachers;
+
+            if (!string.IsNullOrWhiteSpace(TeacherRequest.searchItem))
+            {
+                teacherQuery = teacherQuery.Where(t => t.Name.Contains(TeacherRequest.searchItem));
+            }
+
+
+            if(TeacherRequest.sortOrder?.ToLower() == "desc")
+            {
+                teacherQuery = teacherQuery.OrderByDescending(GetTeacherProperty(TeacherRequest));
+            }
+            else
+            {
+                teacherQuery = teacherQuery.OrderBy(GetTeacherProperty(TeacherRequest));
+            }
+
+            var paginationTeacher = await teacherQuery
+                                        .Skip((TeacherRequest.page - 1) * TeacherRequest.pageSize)
+                                        .Take(TeacherRequest.pageSize)
+                                        .ToListAsync();
+            return paginationTeacher;
         }
     }
 }

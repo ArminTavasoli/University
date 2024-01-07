@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using University.Dto;
+using University.Models;
 using University.Repository;
 
 namespace University.Controllers
@@ -20,9 +21,10 @@ namespace University.Controllers
 
         //Get All Teachers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TeacherDto>>> GetAllTeacher()
+        public async Task<ActionResult<IEnumerable<TeacherDto>>> GetAllTeacher(int page , int pageSize , string? search , string? sortColumn , string? sortOrder)
         {
-            var teacher = await _UniversityRepository.GetAllTeacherAsync();
+            var resultTeacher = new GetTeacher(page , pageSize , search , sortColumn , sortOrder);
+            var teacher = await _UniversityRepository.GetAllTeacherAsync(resultTeacher);
             var AllTeacher = _mapper.Map<IEnumerable<TeacherDto>>(teacher);
             return Ok(new { Message = "All Teacher..." , AllTeacher});
         }
