@@ -17,7 +17,7 @@ namespace University.Repository
 
 
         //Teacher
-        Task<IEnumerable<Teacher>> GetAllTeacherAsync();
+        Task<IEnumerable<Teacher>> GetAllTeacherAsync(GetTeacher TeacherRequest);
 
         Task<Teacher> GetTeacherByIdAsync(int Id);
 
