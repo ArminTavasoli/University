@@ -24,7 +24,7 @@ namespace University.Controllers
         {
             var teacher = await _UniversityRepository.GetAllTeacherAsync();
             var AllTeacher = _mapper.Map<IEnumerable<TeacherDto>>(teacher);
-            return Ok(new { Message = "لیست تمام استادها" , AllTeacher});
+            return Ok(new { Message = "All Teacher..." , AllTeacher});
         }
 
         //Get Teacher With ID
@@ -32,6 +32,10 @@ namespace University.Controllers
         public async Task<ActionResult<TeacherDto>> GetTeacherById(int Id)
         {
             var teacher = await _UniversityRepository.GetTeacherByIdAsync(Id);
+            if(teacher == null)
+            {
+                return BadRequest($"Teacher with ID {Id} not found...");
+            }
             return Ok(_mapper.Map<TeacherDto>(teacher));
         }
 

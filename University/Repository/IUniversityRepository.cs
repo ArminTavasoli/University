@@ -26,9 +26,11 @@ namespace University.Repository
         void DeleteTeacherAsync(Teacher teacher);
 
 
-
+               // Task<IEnumerable<Student>> GetAllStudentAsync(GetStudents request);
         //Students
-        Task<IEnumerable<Student>> GetAllStudentAsync();
+        Task<IEnumerable<Student>> GetAllStudentAsync(GetStudents request);
+
+        // Task<IEnumerable<Student>> GetAllStudentAsync(GetStudents request);
 
         Task<Student> GetStudentByIdAsync(int Id);
 
