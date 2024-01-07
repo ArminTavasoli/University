@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using University.DbContexts;
 using University.Repository;
 
+string AllowedOrigin = "allowedOrigin";
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -23,6 +25,13 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 //Repository
 builder.Services.AddScoped<IUniversityRepository, UniversityRepository>();
 
+
+// CORS
+builder.Services.AddCors(option =>
+{
+    option.AddPolicy(AllowedOrigin, builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -35,6 +44,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors(AllowedOrigin);
 
 app.MapControllers();
 
