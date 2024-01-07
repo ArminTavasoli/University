@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using University.DbContexts;
 using University.Models;
 
@@ -81,9 +82,30 @@ namespace University.Repository
 
         #region StudentRepository
         //Get All Student
-        public async Task<IEnumerable<Student>> GetAllStudentAsync()
+        public async Task<IEnumerable<Student>> GetAllStudentAsync(GetStudents request)
         {
-            return await _context.Students.OrderBy(s => s.ID).ToListAsync();
+            IQueryable<Student> query = _context.Students;
+
+            if (!string.IsNullOrWhiteSpace(request.SearchItem))
+            {
+                query = query.Where(s => s.Name.Contains(request.SearchItem));
+                //_context.Students.Where(s => s.Name.Contains(request.SearchItem));
+            }
+
+            if (request.sortOrder?.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(GetSortProperty(request));
+            }
+            else
+            {
+                query = query.OrderBy(GetSortProperty(request));
+            }
+
+            var result = await query
+                               .Skip((request.page - 1) * request.pageSize)
+                               .Take(request.pageSize)
+                               .ToListAsync();
+            return result;
         }
 
         //Get Student With ID
@@ -254,5 +276,18 @@ namespace University.Repository
         }
 
 
+/*        public async Task<IEnumerable<Student>> GetAllStudentAsync(GetStudents request)
+        {
+
+        }*/
+
+        private Expression<Func<Student, object>> GetSortProperty(GetStudents getStudents)
+    => getStudents.sortColumn?.ToLower()
+            switch
+    {
+        "Name" => student => student.Name,
+        "NationalCode" => student => student.NationalCode,
+        _ => student => student.ID
+    };
     }
 }
