@@ -5,7 +5,7 @@ namespace University.Repository
     public interface IUniversityRepository
     {
         //Lesson
-        Task<IEnumerable<Lesson>> GetAllLessonsAsync();
+        Task<IEnumerable<Lesson>> GetAllLessonsAsync(GetLesson lessonRequest);
 
         Task<Lesson> GetLessonsByIdAsync(int code);
 

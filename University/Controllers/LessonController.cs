@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using University.Dto;
+using University.Models;
 using University.Repository;
 
 namespace University.Controllers
@@ -21,9 +22,10 @@ namespace University.Controllers
         #region Get All Lessons
         //Get All Lessons
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LessonDto>>> GetLessons()
+        public async Task<ActionResult<IEnumerable<LessonDto>>> GetLessons(int page, int pageSize, string? search, string? sortColumn, string? sortOrder)
         {
-            var lessons = await _UniversityRepository.GetAllLessonsAsync();
+            var resultLesson = new GetLesson(page , pageSize , search , sortColumn , sortOrder);
+            var lessons = await _UniversityRepository.GetAllLessonsAsync(resultLesson);
             var AllLesson = _mapper.Map<IEnumerable<LessonDto>>(lessons);
             return Ok(new { Message = "All Lesson List :", AllLesson });
         }

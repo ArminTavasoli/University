@@ -17,10 +17,45 @@ namespace University.Repository
 
         #region LessonRepository
         //All Lesson
-        public async Task<IEnumerable<Lesson>> GetAllLessonsAsync()
+        public async Task<IEnumerable<Lesson>> GetAllLessonsAsync(GetLesson lessonRequest)
         {
-            return await _context.Lessons.OrderBy(o => o.ID).ToListAsync();
+            IQueryable<Lesson> query = _context.Lessons;
+            if (!string.IsNullOrWhiteSpace(lessonRequest.SearchItem))
+            {
+                query = query.Where(l => l.Name.Contains(lessonRequest.SearchItem));
+            }
+            
+            if(lessonRequest.sortOrder?.ToLower() == "desc")
+            {
+                query = query.OrderByDescending(GetSortPropertyLesson(lessonRequest));
+            }
+            else
+            {
+                query = query.OrderBy(GetSortPropertyLesson(lessonRequest));
+            }
+
+            var pagination = await query
+                                  .Skip((lessonRequest.Page -1) * lessonRequest.pageSize)
+                                  .Take(lessonRequest.pageSize)
+                                  .ToListAsync();
+
+            return pagination;
         }
+
+        private Expression<Func<Lesson, object>> GetSortPropertyLesson(GetLesson SortLesson)
+                                          => SortLesson.sortColumn?.ToLower()
+                                                                       switch
+                                                                          {
+                                                                             "Name" => lesson => lesson.Name , 
+                                                                              _ =>lesson => lesson.ID
+                                                                          };
+
+
+
+        /*        public async Task<IEnumerable<Lesson>> GetAllLessonsAsync()
+                {
+                    return await _context.Lessons.OrderBy(o => o.ID).ToListAsync();
+                }*/
 
         //Get Lesson With ID
         public async Task<Lesson> GetLessonsByIdAsync(int code)
@@ -28,11 +63,6 @@ namespace University.Repository
             return await _context.Lessons.Where(l => l.ID == code).FirstOrDefaultAsync();
         }
 
-        //Get Lesson With ID & Include Teacher
-        public async Task<Lesson> GetlessonByTeacher(int code, bool includeTeacher)
-        {
-            throw new NotImplementedException();
-        }
 
         //Add Lesson (Post)
         public async Task<int> AddLessonAsync(Lesson lesson)
@@ -85,13 +115,14 @@ namespace University.Repository
         public async Task<IEnumerable<Student>> GetAllStudentAsync(GetStudents request)
         {
             IQueryable<Student> query = _context.Students;
-
+            //Search
             if (!string.IsNullOrWhiteSpace(request.SearchItem))
             {
                 query = query.Where(s => s.Name.Contains(request.SearchItem));
                 //_context.Students.Where(s => s.Name.Contains(request.SearchItem));
             }
 
+            //Sort
             if (request.sortOrder?.ToLower() == "desc")
             {
                 query = query.OrderByDescending(GetSortProperty(request));
@@ -101,12 +132,15 @@ namespace University.Repository
                 query = query.OrderBy(GetSortProperty(request));
             }
 
+            //Pagination
             var result = await query
                                .Skip((request.page - 1) * request.pageSize)
                                .Take(request.pageSize)
                                .ToListAsync();
             return result;
         }
+
+
 
         //Get Student With ID
         public async Task<Student> GetStudentByIdAsync(int Id)
@@ -282,12 +316,17 @@ namespace University.Repository
         }*/
 
         private Expression<Func<Student, object>> GetSortProperty(GetStudents getStudents)
-    => getStudents.sortColumn?.ToLower()
-            switch
-    {
-        "Name" => student => student.Name,
-        "NationalCode" => student => student.NationalCode,
-        _ => student => student.ID
-    };
+                                               => getStudents.sortColumn?.ToLower()
+                                                       switch
+                                               {
+                                                   "Name" => student => student.Name,
+                                                   "NationalCode" => student => student.NationalCode,
+                                                   _ => student => student.ID
+                                               };
+
+        public Task<Lesson> GetlessonByTeacher(int code, bool includeTeacher)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

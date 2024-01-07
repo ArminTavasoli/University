@@ -2,7 +2,7 @@
 {
     public class LessonDto 
     {
-        public int Code { get; set; }
+        public int ID { get; set; }
 
         public string Name { get; set; }
 
