@@ -35,7 +35,7 @@ namespace University.Controllers
             var result = new GetStudents(page, pageSize, search, sortColumn, sortOrder);
             var student = await _UniversityRepository.GetAllStudentAsync(result);
             var MappingStudent = _mapper.Map<IEnumerable<StudentDto>>(student);
-            return Ok(new { Message = "Student List...", MappingStudent });
+            return Ok(new { Message = "Student List...", MappingStudent, Total = MappingStudent.Count() }) ;
 
         }
 
