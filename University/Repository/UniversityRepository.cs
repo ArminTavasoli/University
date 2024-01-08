@@ -42,6 +42,7 @@ namespace University.Repository
             return pagination;
         }
 
+        //Creare Expression for sort for Lesson
         private Expression<Func<Lesson, object>> GetSortPropertyLesson(GetLesson SortLesson)
                                           => SortLesson.sortColumn?.ToLower()
                                                                        switch
@@ -83,10 +84,44 @@ namespace University.Repository
         #region TeacherRpository
 
         //Get All Teacher
-        public async Task<IEnumerable<Teacher>> GetAllTeacherAsync()
+        public async Task<IEnumerable<Teacher>> GetAllTeacherAsync(GetTeacher TeacherRequest)
         {
-            return await _context.Teachers.OrderBy(t => t.ID).ToArrayAsync();
+            IQueryable<Teacher> teacherQuery = _context.Teachers;
+
+            //Search
+            if (!string.IsNullOrWhiteSpace(TeacherRequest.searchItem))
+            {
+                teacherQuery = teacherQuery.Where(t => t.Name.Contains(TeacherRequest.searchItem));
+            }
+
+            //Sort
+            if (TeacherRequest.sortOrder?.ToLower() == "desc")
+            {
+                teacherQuery = teacherQuery.OrderByDescending(GetTeacherProperty(TeacherRequest));
+            }
+            else
+            {
+                teacherQuery = teacherQuery.OrderBy(GetTeacherProperty(TeacherRequest));
+            }
+
+            //Pagination
+            var paginationTeacher = await teacherQuery
+                                        .Skip((TeacherRequest.page - 1) * TeacherRequest.pageSize)
+                                        .Take(TeacherRequest.pageSize)
+                                        .ToListAsync();
+            return paginationTeacher;
         }
+
+        //Creare Expression for sort Teacher
+        private Expression<Func<Teacher, object>> GetTeacherProperty(GetTeacher getTeacher)
+                => getTeacher.sortCoumn?.ToLower()
+                            switch
+                {
+                    "Name" => lesson => lesson.Name,
+                    "NationalCode" => lesson => lesson.NationalCode,
+                    "Number" => lesson => lesson.PhoneNumber,
+                    _ => lesson => lesson.ID
+                };
 
         //Get Teacher With ID
         public async Task<Teacher> GetTeacherByIdAsync(int Id)
@@ -139,6 +174,16 @@ namespace University.Repository
                                .ToListAsync();
             return result;
         }
+
+        //Create Expression for sort for Student
+        private Expression<Func<Student, object>> GetSortProperty(GetStudents getStudents)
+                                       => getStudents.sortColumn?.ToLower()
+                                               switch
+                                       {
+                                           "Name" => student => student.Name,
+                                           "NationalCode" => student => student.NationalCode,
+                                           _ => student => student.ID
+                                       };
 
 
 
@@ -310,59 +355,11 @@ namespace University.Repository
         }
 
 
-/*        public async Task<IEnumerable<Student>> GetAllStudentAsync(GetStudents request)
-        {
-
-        }*/
-
-        private Expression<Func<Student, object>> GetSortProperty(GetStudents getStudents)
-                                               => getStudents.sortColumn?.ToLower()
-                                                       switch
-                                               {
-                                                   "Name" => student => student.Name,
-                                                   "NationalCode" => student => student.NationalCode,
-                                                   _ => student => student.ID
-                                               };
-
-        private Expression<Func<Teacher, object>> GetTeacherProperty(GetTeacher getTeacher)
-                        => getTeacher.sortCoumn?.ToLower()
-                                    switch
-                                     {
-                                         "Name" => lesson => lesson.Name,
-                                         "NationalCode" => lesson => lesson.NationalCode,
-                                         "Number" => lesson => lesson.PhoneNumber,
-                                         _ => lesson => lesson.ID
-                                     };
-
         public Task<Lesson> GetlessonByTeacher(int code, bool includeTeacher)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Teacher>> GetAllTeacherAsync(GetTeacher TeacherRequest)
-        {
-            IQueryable<Teacher> teacherQuery = _context.Teachers;
 
-            if (!string.IsNullOrWhiteSpace(TeacherRequest.searchItem))
-            {
-                teacherQuery = teacherQuery.Where(t => t.Name.Contains(TeacherRequest.searchItem));
-            }
-
-
-            if(TeacherRequest.sortOrder?.ToLower() == "desc")
-            {
-                teacherQuery = teacherQuery.OrderByDescending(GetTeacherProperty(TeacherRequest));
-            }
-            else
-            {
-                teacherQuery = teacherQuery.OrderBy(GetTeacherProperty(TeacherRequest));
-            }
-
-            var paginationTeacher = await teacherQuery
-                                        .Skip((TeacherRequest.page - 1) * TeacherRequest.pageSize)
-                                        .Take(TeacherRequest.pageSize)
-                                        .ToListAsync();
-            return paginationTeacher;
-        }
     }
 }
