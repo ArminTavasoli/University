@@ -26,7 +26,7 @@ namespace University.Controllers
             var resultTeacher = new GetTeacher(page , pageSize , search , sortColumn , sortOrder);
             var teacher = await _UniversityRepository.GetAllTeacherAsync(resultTeacher);
             var AllTeacher = _mapper.Map<IEnumerable<TeacherDto>>(teacher);
-            return Ok(new { Message = "All Teacher..." , AllTeacher});
+            return Ok(new { Message = "All Teacher..." , AllTeacher   , Total = AllTeacher.Count()});
         }
 
         //Get Teacher With ID
