@@ -27,7 +27,7 @@ namespace University.Controllers
             var resultLesson = new GetLesson(page , pageSize , search , sortColumn , sortOrder);
             var lessons = await _UniversityRepository.GetAllLessonsAsync(resultLesson);
             var AllLesson = _mapper.Map<IEnumerable<LessonDto>>(lessons);
-            return Ok(new { Message = "All Lesson List :", AllLesson });
+            return Ok(new { Message = "All Lesson List :", AllLesson   , Count = AllLesson.Count()});
         }
         #endregion
 
