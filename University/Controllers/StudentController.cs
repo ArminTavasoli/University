@@ -20,15 +20,16 @@ namespace University.Controllers
         }
 
         //Get All Student
-/*        [HttpGet]
-        public async Task<ActionResult<IEnumerable<StudentDto>>> GetAllStudent()
-        {
-            var student = await _UniversityRepository.GetAllStudentAsync();
-            var MappingStudent = _mapper.Map<IEnumerable<StudentDto>>();
-            return Ok(new { Message = "Student List...", MappingStudent });
-        }*/
+        /*        [HttpGet]
+                public async Task<ActionResult<IEnumerable<StudentDto>>> GetAllStudent()
+                {
+                    var student = await _UniversityRepository.GetAllStudentAsync();
+                    var MappingStudent = _mapper.Map<IEnumerable<StudentDto>>();
+                    return Ok(new { Message = "Student List...", MappingStudent });
+                }*/
 
-
+        #region Get All Studetn
+        //Get All Students
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StudentDto>>> GetAllStudents(string? search, string? sortColumn, string? sortOrder, int page, int pageSize)
         {
@@ -38,7 +39,10 @@ namespace University.Controllers
             return Ok(new { Message = "Student List...", MappingStudent, Total = MappingStudent.Count() }) ;
 
         }
+        #endregion
 
+
+        #region Get Student With ID
         //Get Student with ID
         [HttpGet("{Id}")]
         public async Task<ActionResult<StudentDto>> GetStudentWithId(int Id)
@@ -51,7 +55,10 @@ namespace University.Controllers
             var Student = _mapper.Map<StudentDto>(GetStudent);
             return Ok(new {Message = $"You select stuent {GetStudent.Name} with ID {GetStudent.ID} ..."});
         }
+        #endregion
 
+        #region Add Student (Post)
+        //Add Student (Post)
         [HttpPost]
         public async Task<ActionResult<StudentDto>> AddStudentAsync(StudentFotCreationDto studentCreation)
         {
@@ -60,22 +67,28 @@ namespace University.Controllers
             await _UniversityRepository.SaveChanges();
             var FinallyMapStudent = _mapper.Map<StudentDto>(student);
             return Ok(new { Message = $"Stuendt With ID {student.ID} And Name {student.Name} Is Add..." });
-        } 
+        }
+        #endregion
 
-        [HttpPut("{StudentID}")]
-        public async Task<ActionResult> UpdateStudentAsync(int StudentID , StudentForUpdateDto studentForUpdate)
+        #region Edite Student
+        //Edite Student
+        [HttpPut()]
+        public async Task<ActionResult> UpdateStudentAsync(StudentForUpdateDto studentForUpdate)
         {
-            var student = await _UniversityRepository.GetStudentByIdAsync(StudentID);
+            var student = await _UniversityRepository.GetStudentByIdAsync(studentForUpdate.Id);
             if(student == null)
             {
-                return BadRequest($"Student with ID {StudentID} not found...");
+                return BadRequest($"Student with ID {studentForUpdate .Id} not found...");
             }
             _mapper.Map(studentForUpdate , student);
             await _UniversityRepository.SaveChanges();
             var FinallyStudent = _mapper.Map<Dto.StudentDto>(student);
             return Ok(new {Message = $"Student with ID {student.ID} and Name {student.Name} is modify..." });
         }
+        #endregion
 
+        #region Remove studnet
+        //Remove Student
         [HttpDelete("{StudentID}")]
         public async Task<ActionResult> DeleteStudentAsync(int StudentID)
         {
@@ -89,6 +102,7 @@ namespace University.Controllers
             return Ok(new {Message = $"Student with ID {StudentID} id delete..." });
         }
 
+        #endregion
 
 
         #region Relation (Join)
