@@ -63,17 +63,18 @@ namespace University.Controllers
 
         #region Update Lesson
         //Update Lesson
-        [HttpPut("{code}")]
-        public async Task<ActionResult> UpdateLessonAsync(int code, LessonForUpdateDto lessonUpdate)
+        [HttpPut()]
+        public async Task<ActionResult> UpdateLessonAsync(LessonForUpdateDto lessonUpdate)
         {
-            var lesson = await _UniversityRepository.GetLessonsByIdAsync(code);
+            var lesson = await _UniversityRepository.GetLessonsByIdAsync(lessonUpdate.Id);
             if (lesson == null)
             {
-                return StatusCode(404, $"This Lesson with ID {code} Not Found...");
+                return StatusCode(404, $"This Lesson with ID {lessonUpdate.Id} Not Found...");
             }
             _mapper.Map(lessonUpdate, lesson);
             await _UniversityRepository.SaveChanges();
-            return Ok(new {Message = $"The Lesson By Id {code} Is Update" });
+
+            return Ok(new {Message = $"The Lesson By Id {lessonUpdate.Id} Is Update" });
         }
         #endregion
 

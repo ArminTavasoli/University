@@ -4,6 +4,8 @@ namespace University.Dto
 {
     public class StudentForUpdateDto
     {
+        public int Id { get; set; }
+
         [Required]
         [MaxLength(14)]
         public string Name { get; set; }

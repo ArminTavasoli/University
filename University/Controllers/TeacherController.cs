@@ -18,7 +18,7 @@ namespace University.Controllers
             this._mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-
+        #region Get All Teacher
         //Get All Teachers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TeacherDto>>> GetAllTeacher(int page , int pageSize , string? search , string? sortColumn , string? sortOrder)
@@ -28,7 +28,9 @@ namespace University.Controllers
             var AllTeacher = _mapper.Map<IEnumerable<TeacherDto>>(teacher);
             return Ok(new { Message = "All Teacher..." , AllTeacher   , Total = AllTeacher.Count()});
         }
+        #endregion
 
+        #region Get Teacher With ID
         //Get Teacher With ID
         [HttpGet("{Id}")]
         public async Task<ActionResult<TeacherDto>> GetTeacherById(int Id)
@@ -40,7 +42,10 @@ namespace University.Controllers
             }
             return Ok(_mapper.Map<TeacherDto>(teacher));
         }
+        #endregion
 
+
+        #region Add Teacher (Post)
         //Add Teacher (Post)
         [HttpPost]
         public async Task<ActionResult<TeacherDto>> AddTeacherAsync(TeacherForCreationDto teacher)
@@ -52,21 +57,25 @@ namespace University.Controllers
             return Ok(new { Message = $"Teacher { teachermap.Name} with NationalCode {teachermap.NationalCode} " +
                                       $"And PhoneNumber {teachermap.PhoneNumber} Is Add to Teacher List" , finallyTeacher.ID});
         }
+        #endregion
 
 
-        [HttpPut("{TeacherID}")]
-        public async Task<ActionResult> UpdateTeacherAsync(int TeacherID , TeacherForUpdateDto teacherUpdate)
+        #region Edite Teacher (Put)
+        [HttpPut()]
+        public async Task<ActionResult> UpdateTeacherAsync(TeacherForUpdateDto teacherUpdate)
         {
-            var teacherExist = await _UniversityRepository.GetTeacherByIdAsync(TeacherID);
+            var teacherExist = await _UniversityRepository.GetTeacherByIdAsync(teacherUpdate.Id);
             if(teacherExist == null)
             {
-                return StatusCode(404, $"Teacher With ID {TeacherID} not found");
+                return StatusCode(404, $"Teacher With ID {teacherUpdate.Id} not found");
             }
             _mapper.Map(teacherUpdate, teacherExist);
             await _UniversityRepository.SaveChanges();
             return StatusCode(201, $"Teacher with ID {teacherExist.ID} Is Modify");
         }
+        #endregion
 
+        #region Remove Teacher (Delete)
         [HttpDelete("{TeacherID}")]
         public async Task<ActionResult> DeleteTeacherAsync(int TeacherID)
         {
@@ -79,5 +88,6 @@ namespace University.Controllers
             await _UniversityRepository.SaveChanges();
             return StatusCode(201, $"{teacher.Name} By ID {teacher.ID} Is Delete...");
         }
+        #endregion
     }
 }

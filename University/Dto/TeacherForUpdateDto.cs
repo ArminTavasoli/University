@@ -4,6 +4,9 @@ namespace University.Dto
 {
     public class TeacherForUpdateDto
     {
+
+        public int Id { get; set; }
+
         [Required]
         [MaxLength(14)]
         public string Name { get; set; }
