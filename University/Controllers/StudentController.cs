@@ -52,8 +52,7 @@ namespace University.Controllers
             {
                 return BadRequest($"Student with ID {Id} not found ...");
             }
-            var Student = _mapper.Map<StudentDto>(GetStudent);
-            return Ok(new {Message = $"You select stuent {GetStudent.Name} with ID {GetStudent.ID} ..."});
+            return Ok(_mapper.Map<StudentDto>(GetStudent));
         }
         #endregion
 
